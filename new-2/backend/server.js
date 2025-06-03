@@ -9,7 +9,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-//Public API Endpoint (no authentication)
+// Middleware first
+app.use(cors());
+app.use(express.json());
+
+// Public API Endpoint (no authentication)
 app.get("/api/public-test", (req, res) => {
   res.json({
     status: "success",
@@ -18,21 +22,17 @@ app.get("/api/public-test", (req, res) => {
   });
 });
 
-//Middleware
-app.use(cors());
-app.use(express.json());
-
-//API Routes
+// Other API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/stations", stationRoutes);
 
-//Database Connection
+// Database connection and start server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Database connection established");
     app.listen(PORT, () =>
-      console.log(`🚀 Backend server is running on http://localhost:${PORT}`)
+      console.log(`🚀 Backend server is running on port ${PORT}`)
     );
   })
   .catch((err) => {
